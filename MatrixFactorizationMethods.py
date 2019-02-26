@@ -62,7 +62,25 @@ def method_1_off(trainset, testset, k=20, eta=0.03, n_epochs=20, reg=0.1):
     
     return U, V, RMSE
 
-def method_23(trainset, testset, k=20, eta=0.03, n_epochs=20, reg=0.1, reg_bi=0, reg_bu=0):
+def method_2(Y_train, Y_test, reg=0.1, k=20, eta=0.03, eps=0.0001):
+    """
+    Method 2 using our own code. Adds bias term to factorization, but no 
+    regularization. Returns matrix factors and root-mean-squared error.
+    """
+    # get number of users (M) and number of movies (N)
+    M = max(max(Y_train[:,0]), max(Y_test[:,0])).astype(int) # users
+    N = max(max(Y_train[:,1]), max(Y_test[:,1])).astype(int) # movies
+    
+    # train model with bias
+    U,V,a,b, ret = train_model(M, N, k, eta, reg, Y_train, eps=eps, bias=True)
+    
+    # get root-mean-squared error over test data
+    RMSE = get_RMSE(U, V, Y_test, bias=True, a=a, b=b)
+    
+    return U, V, a,b, RMSE
+
+def method_23_off(trainset, testset, k=20, eta=0.03, n_epochs=20, 
+                  reg=0.1, reg_bi=0, reg_bu=0, mu=0):
     """
     Uses off-the-shelf method with bias but no regularization over the bias.
     """
@@ -100,23 +118,25 @@ if __name__=='__main__':
     U1, V1, RMSE1 = method_1(Y_train, Y_test)
     # Method 1: off-the-shelf, no bias, no reg
     U1_off, V1_off, RMSE1_off = method_1_off(trainset, testset)
-    # Method 2: add bias terms, no reg
-    U2, V2, a2, b2, RMSE2 = method_23(trainset, testset)
+    # Method 2: add bias terms, no reg, our code
+    U2, V2, a2, b2, RMSE2 = method_2(Y_train, Y_test)
+    # Method 2: off the shelf
+    U2_off, V2_off, a2_off, b2_off, RMSE2_off = method_23_off(trainset, testset)
     # Method 3: add bias and reg
-    U3, V3, a3, b3, RMSE3 = method_23(trainset, testset, reg_bu=0.1, reg_bi=0.1)
+    U3, V3, a3, b3, RMSE3 = method_23_off(trainset, testset, reg_bu=0.1, reg_bi=0.1)
     
     # compare performance
     print('Method 1: RMSE = %.4f' % RMSE1)
     print('Method 1 off the shelf: RMSE = %.4f' % RMSE1_off)
     print('Method 2: RMSE = %.4f' % RMSE2)
+    print('Method 2 off the shelf: RMSE = %.4f' % RMSE2_off)
     print('Method 3: RMSE = %.4f' % RMSE3)
     
-    # Once the best method has been determined, we will save it to a pickle file
+    # save results
     params = {}
-    params['U'] = U2
-    params['V'] = V2
-    params['a'] = a2
-    params['b'] = b2
+    params['method 1'] = [U1, V1, RMSE1]
+    params['method 2'] = [U2, V2, a2, b2, RMSE2]
+    params['method 3'] = [U3, V3, a3, b3, RMSE3]
     
-    with open('matrix_factorization.pkl', 'wb') as f:
+    with open('data/matrix_factorization.pkl', 'wb') as f:
         pkl.dump(params, f)
