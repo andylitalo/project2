@@ -12,14 +12,13 @@ def load_matrix_factorization(filepath='data/matrix_factorization.pkl'):
     Loads the parameters of the matrix factorization.
     """
     with open(filepath, 'rb') as f:
-        params_dict = pkl.load(f)
+        params = pkl.load(f)
         
-    U = params_dict['U']
-    V = params_dict['V']
-    a = params_dict['a']
-    b = params_dict['b']
+    U1, V1, RMSE1 = params['method 1']
+    U2, V2, a2, b2, RMSE2 = params['method 2']
+    U3, V3, a3, b3, RMSE3 = params['method 3']
     
-    return U, V, a, b
+    return U1, V1, U2, V2, a2, b2, U3, V3, a3, b3
 
 
 def mean_center(V):
@@ -33,24 +32,20 @@ def step_2a(V):
     """
     Step 2a does SVD of V and returns the first two columns of the left matrix.
     """
-    # SVD of V matrix from matrix factorization
+    # SVD of V matrix from matrix factorization and project for each method
     A, Sigma, B = np.linalg.svd(V)
-    
-    # get the number of dimensions of the matrix factorization
     k = len(B)
+    A_2d = A[:k,0:2]
     
-    # first two columns of A^T
-    A12 = A[:k,0:2]
-    
-    return A12
+    return A_2d
 
 
-def step_2b(U, V, A12):
+def step_2b(U, V, A_2d):
     """
     Project every movie and user onto the first two columns of A.
     """
-    U_proj = np.matmul(np.transpose(A12),np.transpose(U))
-    V_proj = np.matmul(np.transpose(A12),np.transpose(V))
+    U_proj = np.matmul(np.transpose(A_2d),np.transpose(U))
+    V_proj = np.matmul(np.transpose(A_2d),np.transpose(V))
     
     return U_proj, V_proj
 
@@ -72,20 +67,27 @@ def step_2c(U_proj, V_proj):
 # main function to run step 2
 if __name__=='__main__':
     # load parameters: U is M x k, V is N x k, a is M x 1, b is N x 1
-    U, V, a, b = load_matrix_factorization()
+    U1, V1, U2, V2, a2, b2, U3, V3, a3, b3 = load_matrix_factorization()
     
     # step 2a: return first two columns of left matrix in SVD of V, N x 2
-    A12 = step_2a(V)
+    A1 = step_2a(V1)
+    A2 = step_2a(V2)
+    A3 = step_2a(V3)
+    
     # step 2b: project all movies and users onto first two columns of A
     # U_proj is 2 x M and V_proj is 2 x N
-    U_proj, V_proj = step_2b(U, V, A12)
+    U1_proj, V1_proj = step_2b(U1, V1, A1)
+    U2_proj, V2_proj = step_2b(U2, V2, A2)
+    U3_proj, V3_proj = step_2b(U3, V3, A3)
     # step 2c: normalize to unit variance
-    U_norm, V_norm = step_2c(U_proj, V_proj)
+    U1_norm, V1_norm = step_2c(U1_proj, V1_proj)
+    U2_norm, V2_norm = step_2c(U2_proj, V2_proj)
+    U3_norm, V3_norm = step_2c(U3_proj, V3_proj)
     
     # save data
     params = {}
-    params['projected users'] = U_norm
-    params['projected movies'] = V_norm
+    params['projected users'] = [U1_norm, U2_norm, U3_norm]
+    params['projected movies'] = [V1_norm, V2_norm, V3_norm]
     
     with open('data/projection_data.pkl', 'wb') as f:
         pkl.dump(params, f)
