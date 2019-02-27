@@ -17,7 +17,7 @@ def load_matrix_factorization(filepath='data/matrix_factorization.pkl'):
     U1, V1, RMSE1 = params['method 1']
     U2, V2, a2, b2, RMSE2 = params['method 2']
     U3, V3, a3, b3, RMSE3 = params['method 3']
-    
+ 
     return U1, V1, U2, V2, a2, b2, U3, V3, a3, b3
 
 
@@ -34,8 +34,7 @@ def step_2a(V):
     """
     # SVD of V matrix from matrix factorization and project for each method
     A, Sigma, B = np.linalg.svd(V)
-    k = len(B)
-    A_2d = A[:k,0:2]
+    A_2d = A[:,0:2]
     
     return A_2d
 
@@ -44,8 +43,8 @@ def step_2b(U, V, A_2d):
     """
     Project every movie and user onto the first two columns of A.
     """
-    U_proj = np.matmul(np.transpose(A_2d),np.transpose(U))
-    V_proj = np.matmul(np.transpose(A_2d),np.transpose(V))
+    U_proj = np.matmul(np.transpose(A_2d),U)
+    V_proj = np.matmul(np.transpose(A_2d),V)
     
     return U_proj, V_proj
 
