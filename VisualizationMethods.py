@@ -106,6 +106,58 @@ def plot_movies(data, title='', x_lim=[-5,5], y_lim=[-5,5]):
     ax.set_xlim(x_lim)
     ax.set_ylim(y_lim)
     
+def plot_movies_three_methods(movie_data, data_all, genre, title_prefix='', x_lim=[-5,5], 
+                              y_lim=[-5,5]):
+    """
+    Plots movies from given genre for all three methods.
+    """
+    # extract data for each method from list of data
+    data_1, data_2, data_3 = data_all
+    # get indices of movies in genre
+    inds = get_movies_from_genre(movie_data, genre)
+    
+    # plot movies - method 1
+    proj_1 = get_proj(inds, data_1)
+    plot_movies(proj_1, title=title_prefix + "method 1")
+
+    # plot movies - method 2
+    proj_2 = get_proj(inds, data_2)
+    plot_movies(proj_2, title=title_prefix + "method 2")
+    
+    # plot movies - method 3
+    proj_3 = get_proj(inds, data_3)
+    plot_movies(proj_3, title=title_prefix + "method 3")
+ 
+    
+def plot_genres_three_methods(movie_data, data_all, genre_list, x_lim=[-5,5], y_lim=[-5,5]):
+    """
+    Plots movies of different genres in different colors for all three methods.
+    """
+    
+    for i in range(len(data_all)):
+        data = data_all[i]
+        fig = plt.figure()
+        ax = fig.add_subplot(1,1,1)
+        # plot movies from each genre in a different color
+        for j in range(len(genre_list)):
+            genre = genre_list[j]
+            # get indices of movies in genre
+            inds = get_movies_from_genre(movie_data, genre)
+            proj = get_proj(inds, data)
+            x = proj[:,0]
+            y = proj[:,1]
+            ax.plot(x, y, 'o', label=genre)
+        title = "Method " + str(i+1) + " - "
+        for i in range(len(genre_list)-1):
+            title += genre_list[i]
+            if i < len(genre_list):
+                title += ", "
+        ax.set_title(title)
+        ax.set_xlim(x_lim)
+        ax.set_ylim(y_lim)
+    
+    
+    
 # main function for running methods
 if __name__=='__main__':
     # load projected data (2 x M and 2 x N)
@@ -117,28 +169,23 @@ if __name__=='__main__':
     # plot top 10 movies (ratings)
     inds_best_ten = best_ten_movies(movie_data, rating_data)
     best_ten_proj_1 = get_proj(inds_best_ten, movies_1)
-    plot_movies(best_ten_proj_1)
+    plot_movies(best_ten_proj_1, title='top 10 - method 1')
+    
+    # plot top 10 movies (ratings) - method 2
+    inds_best_ten = best_ten_movies(movie_data, rating_data)
+    best_ten_proj_2 = get_proj(inds_best_ten, movies_2)
+    plot_movies(best_ten_proj_2, title='top 10 - method 2')
+    
+    # plot top 10 movies (ratings) - method 3
+    best_ten_proj_3 = get_proj(inds_best_ten, movies_3)
+    plot_movies(best_ten_proj_3, title='top 10 - method 3')
     
     # plot most popular 10 movies (popularity)
     inds_pop_ten = pop_ten_movies(rating_data)
     pop_ten_proj_1 = get_proj(inds_pop_ten, movies_1)
     plot_movies(pop_ten_proj_1)
-    
-    # plot horror movies
-    inds_horror = get_movies_from_genre(movie_data, 'Horror')
-    horror_proj_1 = get_proj(inds_horror, movies_1)
-    plot_movies(horror_proj_1)
-    
-    # plot musical movies
-    inds_musical = get_movies_from_genre(movie_data, 'Musical')
-    musical_proj_1 = get_proj(inds_musical, movies_1)
-    plot_movies(musical_proj_1)
-    
-    # plot musical movies
-    inds_musical = get_movies_from_genre(movie_data, 'Musical')
-    musical_proj_3 = get_proj(inds_musical, movies_3)
-    plot_movies(musical_proj_3)
-#    plt.plot(users_1[0,:], users_1[1,:], 'o')
-#    
-#    plt.figure()
-#    plt.plot(movies_2[0,:], movies_2[1,:], 'o')
+
+    movies_all = [movies_1, movies_2, movies_3]
+    # compare genres
+    plot_genres_three_methods(movie_data, movies_all, ["Musical", "Horror",
+                                                       "Documentary", "Western"])
