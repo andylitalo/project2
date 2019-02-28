@@ -2,7 +2,6 @@
 These methods are used to visualize the projected data.
 """
 
-import seaborn as sns
 import pickle as pkl
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -93,10 +92,12 @@ def get_proj(inds, proj):
     """
     return np.array([proj[:,i] for i in range(len(proj[0,:])) if i in inds])
     
-def plot_movies(data, title='', x_lim=[-5,5], y_lim=[-5,5]):
+def plot_movies(data, movie_data, title='', indices='',x_lim=[-5,5], y_lim=[-5,5]):
     """
-    Plots movie projections in standard format for consistency.
+    Plots labeled movie projections in standard format for consistency.
     """
+    titles = movie_data['Movie Title'][indices]
+    titles = list(titles)
     x = data[:,0]
     y = data[:,1]
     fig = plt.figure()
@@ -105,6 +106,8 @@ def plot_movies(data, title='', x_lim=[-5,5], y_lim=[-5,5]):
     ax.set_title(title)
     ax.set_xlim(x_lim)
     ax.set_ylim(y_lim)
+    for txt in range(len(x)):
+        ax.annotate(titles[txt],((x[txt],y[txt])))
     
 def plot_movies_three_methods(movie_data, data_all, genre, title_prefix='', x_lim=[-5,5], 
                               y_lim=[-5,5]):
@@ -118,15 +121,16 @@ def plot_movies_three_methods(movie_data, data_all, genre, title_prefix='', x_li
     
     # plot movies - method 1
     proj_1 = get_proj(inds, data_1)
-    plot_movies(proj_1, title=title_prefix + "method 1")
+    plot_movies(proj_1, movie_data, indices = inds, title=title_prefix + "method 1")
+    
 
     # plot movies - method 2
     proj_2 = get_proj(inds, data_2)
-    plot_movies(proj_2, title=title_prefix + "method 2")
+    plot_movies(proj_2, movie_data, indices = inds, title=title_prefix + "method 2")
     
     # plot movies - method 3
     proj_3 = get_proj(inds, data_3)
-    plot_movies(proj_3, title=title_prefix + "method 3")
+    plot_movies(proj_3, movie_data, indices = inds, title=title_prefix + "method 3")
  
     
 def plot_genres_three_methods(movie_data, data_all, genre_list, x_lim=[-5,5], y_lim=[-5,5]):
@@ -155,6 +159,7 @@ def plot_genres_three_methods(movie_data, data_all, genre_list, x_lim=[-5,5], y_
         ax.set_title(title)
         ax.set_xlim(x_lim)
         ax.set_ylim(y_lim)
+        ax.legend([genre_list[1],genre_list[2],genre_list[3]])
     
     
     
@@ -169,21 +174,21 @@ if __name__=='__main__':
     # plot top 10 movies (ratings)
     inds_best_ten = best_ten_movies(movie_data, rating_data)
     best_ten_proj_1 = get_proj(inds_best_ten, movies_1)
-    plot_movies(best_ten_proj_1, title='top 10 - method 1')
+    plot_movies(best_ten_proj_1, movie_data, indices = inds_best_ten, title='top 10 - method 1')
     
     # plot top 10 movies (ratings) - method 2
     inds_best_ten = best_ten_movies(movie_data, rating_data)
     best_ten_proj_2 = get_proj(inds_best_ten, movies_2)
-    plot_movies(best_ten_proj_2, title='top 10 - method 2')
+    plot_movies(best_ten_proj_2, movie_data, indices = inds_best_ten, title='top 10 - method 2')
     
     # plot top 10 movies (ratings) - method 3
     best_ten_proj_3 = get_proj(inds_best_ten, movies_3)
-    plot_movies(best_ten_proj_3, title='top 10 - method 3')
+    plot_movies(best_ten_proj_3, movie_data, indices = inds_best_ten, title='top 10 - method 3')
     
     # plot most popular 10 movies (popularity)
     inds_pop_ten = pop_ten_movies(rating_data)
     pop_ten_proj_1 = get_proj(inds_pop_ten, movies_1)
-    plot_movies(pop_ten_proj_1)
+    plot_movies(pop_ten_proj_1, movie_data, indices = inds_pop_ten, title='top 10 - most popular')
 
     movies_all = [movies_1, movies_2, movies_3]
     # compare genres
