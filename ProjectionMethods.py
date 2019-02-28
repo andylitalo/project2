@@ -39,10 +39,12 @@ def mean_center(V):
     return V
 
 
-def step_2a(V):
+def step_2a(V, center_matrix=True):
     """
     Step 2a does SVD of V and returns the first two columns of the left matrix.
     """
+    if center_matrix:
+        V = mean_center(V)
     # SVD of V matrix from matrix factorization and project for each method
     A, Sigma, B = np.linalg.svd(V)
     A_2d = A[:,0:2]
