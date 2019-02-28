@@ -27,11 +27,13 @@ def mean_center(V):
     """
     return V - np.transpose(np.array([np.mean(V, axis=1)]))
 
-
-def step_2a(V):
+def step_2a(V, mean_center=False):
     """
     Step 2a does SVD of V and returns the first two columns of the left matrix.
     """
+    if mean_center:
+        # mean center V
+        V = mean_center(V)
     # SVD of V matrix from matrix factorization and project for each method
     A, Sigma, B = np.linalg.svd(V)
     A_2d = A[:,0:2]
@@ -65,7 +67,7 @@ def step_2c(U_proj, V_proj):
 
 # main function to run step 2
 if __name__=='__main__':
-    # load parameters: U is M x k, V is N x k, a is M x 1, b is N x 1
+    # load parameters: U is k x M, V is k x N, a is M x 1, b is N x 1
     U1, V1, U2, V2, a2, b2, U3, V3, a3, b3 = load_matrix_factorization()
     
     # step 2a: return first two columns of left matrix in SVD of V, N x 2
@@ -78,6 +80,7 @@ if __name__=='__main__':
     U1_proj, V1_proj = step_2b(U1, V1, A1)
     U2_proj, V2_proj = step_2b(U2, V2, A2)
     U3_proj, V3_proj = step_2b(U3, V3, A3)
+    
     # step 2c: normalize to unit variance
     U1_norm, V1_norm = step_2c(U1_proj, V1_proj)
     U2_norm, V2_norm = step_2c(U2_proj, V2_proj)
