@@ -42,7 +42,7 @@ def get_RMSE_off(model, testset):
     
     return RMSE
 
-def method_1_off(trainset, testset, k=20, eta=0.03, n_epochs=40, reg=0.1):
+def method_1_off(trainset, testset, k=20, eta=0.03, n_epochs=100, reg=0.1):
     """
     Uses off-the-shelf method without bias.
     """
@@ -79,7 +79,7 @@ def method_2(Y_train, Y_test, reg=0.1, k=20, eta=0.03, eps=0.0001):
     
     return U, V, a,b, RMSE
 
-def method_23_off(trainset, testset, k=20, eta=0.03, n_epochs=40, 
+def method_23_off(trainset, testset, k=20, eta=0.03, n_epochs=100, 
                   reg=0.1, reg_bi=0, reg_bu=0):
     """
     Uses off-the-shelf method with bias but no regularization over the bias.
