@@ -219,7 +219,7 @@ fantasy_proj_1 = get_proj(Fant_movie_indices[0:N], movies_3)
 plot_movies(fantasy_proj_1, movie_data, indices = Fant_movie_indices[0:N], title='Some Fantasy Movies')
 
 
-'''
+
 #Nearest neighbors (not working yet)
 def nearest_n_neighbors(N, movie_index, mult_movie_indices, proj):
     """
@@ -240,24 +240,15 @@ def nearest_n_neighbors(N, movie_index, mult_movie_indices, proj):
         dist[i] = np.sqrt((x-x2)**2 + (y-y2)**2)
     
     nearest_neighbor_indices = np.zeros(N)
-    indices = np.zeros(len(mult_movie_indices))
-    
-    indices = list(indices)
-    dist = list(dist)
-    
-    for i in range(len(mult_movie_indices)):
-        indices[i] = i
-    
     for i in range(N):
         min_dist = 1000
         index = 1000
         for j in range(len(dist)):
             if dist[j] < min_dist:
                 min_dist = dist[j]
-                index = indices[j]
+                index = j
         nearest_neighbor_indices[i] = index
-        del dist[index]
-        del indices[index]
+        dist[index] = 1000
         
     return(nearest_neighbor_indices)   
 
@@ -277,4 +268,3 @@ for i in range(len(nearest_horror_to_star_wars)):
 indices[-1] = ind_most_pop
 fantasy_proj_1 = get_proj(indices, movies_3)
 plot_movies(fantasy_proj_1, movie_data, indices = indices, title='Star wars and closest horror movies')
-'''
