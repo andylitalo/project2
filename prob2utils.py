@@ -12,7 +12,7 @@ def grad_U(Ui, Yij, Vj, reg, eta, ai=0, bj=0):
     Returns the gradient of the regularized loss function with
     respect to Ui multiplied by eta.
     """
-    grad = reg*Ui - 2*Vj*(Yij-(np.dot(Ui,Vj) + ai + bj))
+    grad = reg*Ui - Vj*(Yij-(np.dot(Ui,Vj) + ai + bj))
     
     return eta*grad
 
@@ -25,7 +25,7 @@ def grad_V(Vj, Yij, Ui, reg, eta, ai=0, bj=0):
     Returns the gradient of the regularized loss function with
     respect to Vj multiplied by eta.
     """
-    grad = reg*Vj - 2*Ui*(Yij - (np.dot(Ui,Vj) + ai + bj))
+    grad = reg*Vj - Ui*(Yij - (np.dot(Ui,Vj) + ai + bj))
     
     return eta*grad
 
@@ -39,7 +39,7 @@ def grad_a(Ui, Vj, Yij, eta, ai, bj):
     Returns the gradient of the regularized loss function with
     respect to ai multiplied by eta.
     """
-    grad =  - 2*(Yij - (np.dot(Ui,Vj) + ai + bj))
+    grad =  - (Yij - (np.dot(Ui,Vj) + ai + bj))
     
     return eta*grad
 
@@ -53,7 +53,7 @@ def grad_b(Ui, Vj, Yij, eta, ai, bj):
     Returns the gradient of the regularized loss function with
     respect to bj multiplied by eta.
     """
-    grad =  - 2*(Yij - (np.dot(Ui,Vj) + ai + bj))
+    grad =  - (Yij - (np.dot(Ui,Vj) + ai + bj))
     
     return eta*grad
 
@@ -85,6 +85,33 @@ def get_RMSE(U, V, Y, bias=False, a=None, b=None):
     RMSE = np.sqrt(sq_err/num_samples)
     
     return RMSE
+
+def get_err(U, V, Y, bias=False, a=None, b=None):
+    """
+    Returns the root-mean-square error of the matrix factorization U, V over Y.
+    """
+    # number of samples
+    num_samples = float(len(Y))
+    
+    # calculate squared error term by sum loss for each entry of Y
+    sq_err = 0
+    for ind in range(len(Y)):
+        # extract parameters (i and j are 1-indexed for some reason...)
+        i = Y[ind,0]-1
+        j = Y[ind,1]-1
+        Yij = Y[ind,2]
+        Ui = U[i,:]
+        Vj = V[j,:]
+        if bias:
+            ai = a[i]
+            bj = b[j]
+        else:
+            ai = 0
+            bj = 0
+        # add term
+        sq_err += (Yij - (np.dot(Ui,Vj) + ai + bj))**2
+    
+    return 0.5*sq_err/num_samples
 
 def train_model(M, N, K, eta, reg, Y, eps=0.0001, max_epochs=300, get_all_RMSE=False,
                 bias=False):
