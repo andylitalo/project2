@@ -220,7 +220,7 @@ plot_movies(fantasy_proj_1, movie_data, indices = Fant_movie_indices[0:N], title
 
 
 
-#Nearest neighbors (not working yet)
+#Nearest neighbors
 def nearest_n_neighbors(N, movie_index, mult_movie_indices, proj):
     """
     Returns the indices of the nearest n neighbors to a given movie from the 
