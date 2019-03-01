@@ -202,6 +202,37 @@ def get_title_genres(ind, headers):
             
     return movie_str
     
+def nearest_n_neighbors(N, movie_index, mult_movie_indices, proj):
+    """
+    Returns the indices of the nearest n neighbors to a given movie from the 
+    movies indexed in mult_movie_indices.
+    """
+    
+    if N > len(mult_movie_indices):
+        N = len(mult_movie_indices)
+        
+    x = proj[0,movie_index]
+    y = proj[1,movie_index]
+    
+    dist = -1*np.ones(len(mult_movie_indices))
+    for i in range(len(mult_movie_indices)):
+        x2 = proj[0,mult_movie_indices[i]]
+        y2 = proj[1,mult_movie_indices[i]] 
+        dist[i] = np.sqrt((x-x2)**2 + (y-y2)**2)
+    
+    nearest_neighbor_indices = np.zeros(N)
+    for i in range(N):
+        min_dist = 1000
+        index = 1000
+        for j in range(len(dist)):
+            if dist[j] < min_dist:
+                min_dist = dist[j]
+                index = j
+        nearest_neighbor_indices[i] = index
+        dist[index] = 1000
+        
+    return(nearest_neighbor_indices)
+
 def print_most_extreme(movie_data, data_all, num=5):
     """
     Prints the names of the movies with the most extreme values of each coordinate.
